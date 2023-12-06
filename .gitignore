@@ -16,3 +16,11 @@ node_modules
 
 # Typescript build
 dist
+
+# Replit config files
+.replit
+.config
+.upm
+
+# Environment
+*.env
