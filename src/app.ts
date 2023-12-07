@@ -18,10 +18,10 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
- const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
-//const localUri = 'mongodb://localhost:27017/mestodb';
+//const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
+const localUri = 'mongodb://localhost:27017/mestodb';
 
-mongoose.connect(uri);
+mongoose.connect(localUri);
 
 server.use(limiter);
 server.use(helmet());
