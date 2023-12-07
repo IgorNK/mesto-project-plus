@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-import { WebError } from "./errors";
+import { WebError, NotFoundError } from "./errors";
 import cardsRouter from "./routes/cards";
 import usersRouter from "./routes/users";
 
@@ -27,6 +27,9 @@ server.use((req: Request, res: Response, next: NextFunction) => {
 
 server.use('/', cardsRouter);
 server.use('/', usersRouter);
+server.use((req: Request, res: Response) => {
+  throw new NotFoundError("Page not found");
+});
 
 server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   let statusCode = 500;

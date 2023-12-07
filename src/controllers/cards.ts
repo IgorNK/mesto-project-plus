@@ -5,40 +5,42 @@ import Card from "../models/card";
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   return Card.find({})
-    .then(cards => res.json(cards))
-    .then(cards => res.status(201).send(cards))
+    .then(cards => res.status(201).json(cards))
     .catch(next);
 };
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
   const ownerId = req.user._id;
-  if (!name || !link) {
-    throw new BadRequestError("Bad request, couldn't create card");
-  }
-  if (!ownerId) {
-    throw new ForbiddenError("Forbidden, you must be authorized");
-  }
 
   return Card.create({ name, link, owner: ownerId })
-    .then(card => res.json(card))
-    .then(card => res.status(201).send(card))
-    .catch(next);
+    .then(card => res.status(201).json(card))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError("Bad request, couldn't create card"));
+        return;
+      }
+      next(err);
+    });
 };
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const userId = req.user._id;
-  if (!id) {
-    throw new BadRequestError("Bad request, couldn't delete card");
-  }
-  if (!userId) {
-    throw new ForbiddenError("Forbidden, you must be authorized");
-  }
 
   return Card.deleteOne({ _id: id, owner: userId })
     .then(() => res.status(204).send())
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError("Bad request, couldn't delete card"));
+        return;
+      }
+      if (err.name === 'CastError') {
+        next(new BadRequestError("Bad request, couldn't delete card"));
+        return;
+      }
+      next(err);
+    });
 }
 
 export const likeCard = (req: Request, res: Response, next: NextFunction) => {
@@ -51,10 +53,15 @@ export const likeCard = (req: Request, res: Response, next: NextFunction) => {
       if (!card) {
         throw new NotFoundError("Card not found");
       }
-      return res.json();
+      return res.status(200).json({ message: "Liked successfully" });
     })
-    .then(() => res.status(204).send())
-    .catch(next);
+    .catch(err => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError("Bad request. Couldn't like a card."));
+        return;
+      }
+      next(err);
+    });
 };
 
 export const dislikeCard = (req: Request, res: Response, next: NextFunction) => {
@@ -67,7 +74,13 @@ export const dislikeCard = (req: Request, res: Response, next: NextFunction) => 
       if (!card) {
         throw new NotFoundError("Card not found");
       }
+      return res.status(200).json({ message: "Disliked successfully" });
     })
-    .then(() => res.status(204).send())
-    .catch(next);
+    .catch(err => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError("Bad request. Couldn't dislike a card."));
+        return;
+      }
+      next(err);
+    });
 };
