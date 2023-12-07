@@ -1,21 +1,25 @@
 import express, { Request, Response, NextFunction } from "express";
+import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import { WebError } from "./errors";
 import cardsRouter from "./routes/cards";
 import usersRouter from "./routes/users";
 
-const { PORT = 3000, BASE_PATH } = process.env;
+const { PORT = 3000 } = process.env;
 
 const server = express();
+const jsonParser = bodyParser.json();
 
-const uri = "mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority";
 const localUri = "mongodb://localhost:27017/mestodb";
 
 mongoose.connect(uri);
 
+server.use(jsonParser);
+
 server.use((req: Request, res: Response, next: NextFunction) => {
   req.user = {
-    _id: "5f446f2e1c71888e2233621e",
+    _id: "6571872aeb7aa758b3ab4e59",
   };
 
   next();
@@ -40,7 +44,4 @@ server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   }); 
 });
 
-server.listen(PORT, () => {
-  console.log('Server link: ');
-  console.log(BASE_PATH);
-});
+server.listen(PORT);

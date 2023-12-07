@@ -44,7 +44,9 @@ export const likeCard = (req: Request, res: Response, next: NextFunction) => {
       if (!card) {
         throw new NotFoundError("Card not found");
       }
+      return res.json();
     })
+    .then(() => res.status(204).send())
     .catch(next);
 };
 
@@ -59,5 +61,6 @@ export const dislikeCard = (req: Request, res: Response, next: NextFunction) => 
         throw new NotFoundError("Card not found");
       }
     })
+    .then(() => res.status(204).send())
     .catch(next);
 };
