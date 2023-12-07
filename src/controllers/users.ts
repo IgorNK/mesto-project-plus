@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { NotFoundError, BadRequestError } from '../errors';
+import { NotFoundError, BadRequestError, ForbiddenError } from '../errors';
 
 import User from "../models/user";
 
@@ -24,14 +24,12 @@ export const getUserById = (req: Request, res: Response, next: NextFunction) => 
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar } = req.body;
+  if (!name || !about || !avatar) {
+    throw new BadRequestError("Bad request, couldn't create user.");
+  }
 
   return User.create({ name, about, avatar })
-    .then(user => {
-      if (!user) {
-        throw new BadRequestError("Coudn't create user");
-      }
-      return res.json(user);
-    })
+    .then(user => res.json(user))
     .then(user => res.status(201).send(user))
     .catch(next);
 };
@@ -39,14 +37,15 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 export const updateUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
   const userId = req.user._id;
+  if (!name || !about) {
+    throw new BadRequestError("Bad request, couldn't update user");
+  }
+  if (!userId) {
+    throw new ForbiddenError("Forbidden, you must be authorized");
+  }
 
   return User.findByIdAndUpdate(userId, { name, about }, { new: true })
-    .then(user => {
-      if (!user) {
-        throw new BadRequestError("Couldn't update user");
-      }
-      return res.json(user);
-    })
+    .then(user => res.json(user))
     .then(user => res.status(201).send(user))
     .catch(next);
 };
@@ -54,14 +53,15 @@ export const updateUser = (req: Request, res: Response, next: NextFunction) => {
 export const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
   const userId = req.user._id;
+  if (!avatar) {
+    throw new BadRequestError("Bad request, couldn't update avatar");
+  }
+  if (!userId) {
+    throw new ForbiddenError("Forbidden, you must be authorized");
+  }
 
   return User.findByIdAndUpdate(userId, { avatar }, { new: true })
-    .then(user => {
-      if (!user) {
-        throw new BadRequestError("Couldn't update user avatar");
-      }
-      return res.json(user);
-    })
+    .then(user => res.json(user))
     .then(user => res.status(201).send(user))
     .catch(next);
 };

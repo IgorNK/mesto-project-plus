@@ -18,3 +18,10 @@ export class BadRequestError extends WebError {
     super(message);
   }
 }
+
+export class ForbiddenError extends WebError {
+  readonly statusCode = 403;
+  constructor(message: string) {
+    super(message);
+  }
+}

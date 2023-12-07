@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { NotFoundError, BadRequestError } from "../errors";
+import { NotFoundError, BadRequestError, ForbiddenError } from "../errors";
 
 import Card from "../models/card";
 
@@ -13,14 +13,15 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
   const ownerId = req.user._id;
+  if (!name || !link) {
+    throw new BadRequestError("Bad request, couldn't create card");
+  }
+  if (!ownerId) {
+    throw new ForbiddenError("Forbidden, you must be authorized");
+  }
 
   return Card.create({ name, link, owner: ownerId })
-    .then(card => {
-      if (!card) {
-        throw new BadRequestError("Couldn't create card");
-      }
-      return res.json(card);
-    })
+    .then(card => res.json(card))
     .then(card => res.status(201).send(card))
     .catch(next);
 };
@@ -28,6 +29,12 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const userId = req.user._id;
+  if (!id) {
+    throw new BadRequestError("Bad request, couldn't delete card");
+  }
+  if (!userId) {
+    throw new ForbiddenError("Forbidden, you must be authorized");
+  }
 
   return Card.deleteOne({ _id: id, owner: userId })
     .then(() => res.status(204).send())
