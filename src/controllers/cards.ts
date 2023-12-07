@@ -27,7 +27,12 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const userId = req.user._id;
 
   return Card.deleteOne({ _id: id, owner: userId })
-    .then(() => res.status(204).send())
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError('Card not found');
+      }
+      return res.status(200).send({ message: 'Delete sucessful' });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError("Bad request, couldn't delete card"));
