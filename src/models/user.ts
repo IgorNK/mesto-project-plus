@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, Schema } from 'mongoose';
 
 export interface IUser {
   name: string;
@@ -25,4 +25,4 @@ const userSchema = new Schema<IUser>({
   },
 });
 
-export default model<IUser>("user", userSchema);
+export default model<IUser>('user', userSchema);
