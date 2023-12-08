@@ -16,7 +16,7 @@ const errorTransport = new winston.transports.DailyRotateFile({
   maxFiles: 3,
 });
 
-const requestLogger = expressWinston.logger({
+export const requestLogger = expressWinston.logger({
   transports: [
     new winston.transports.Console({
       format: winston.format.simple(),
@@ -26,14 +26,9 @@ const requestLogger = expressWinston.logger({
   format: winston.format.json(),
 })
 
-const errorLogger = expressWinston.errorLogger({
+export const errorLogger = expressWinston.errorLogger({
   transports: [
     errorTransport,
   ],
   format: winston.format.json(),
 });
-
-export default {
-  requestLogger,
-  errorLogger,
-};

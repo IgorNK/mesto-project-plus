@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
+import path from 'path';
 import mongoose from 'mongoose';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
@@ -22,13 +23,16 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-//const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
-const localUri = 'mongodb://localhost:27017/mestodb';
+const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
+//const localUri = 'mongodb://localhost:27017/mestodb';
 
-mongoose.connect(localUri);
+mongoose.connect(uri);
 
 server.use(limiter);
-server.use(helmet());
+server.use(helmet({
+  contentSecurityPolicy: false,
+  }),
+);
 server.use(jsonParser);
 
 // server.use((req: Request, res: Response, next: NextFunction) => {
@@ -40,10 +44,11 @@ server.use(jsonParser);
 // });
 server.use(requestLogger);
 
+server.use(express.static(path.join(__dirname, '../public/dist')));
 server.post('/signin', login);
 server.post('/signup', createUser);
 server.use('/', cardsRouter);
-server.use(auth);
+// server.use(auth);
 server.use('/', usersRouter);
 
 server.use(errorLogger);

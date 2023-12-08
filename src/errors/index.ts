@@ -1,11 +1,11 @@
 import WebError from './web-error';
 import BadRequestError from './bad-request';
 import NotFoundError from './not-found';
-import ForbiddenError from './forbidden';
+import UnauthorizedError from './unauthorized';
 
 export {
   WebError,
   BadRequestError,
   NotFoundError,
-  ForbiddenError,
+  UnauthorizedError,
 };

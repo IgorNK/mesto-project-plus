@@ -47,11 +47,12 @@ export const getCurrentUser = (req: Request, res: Response, next: NextFunction) 
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar, email, password } = req.body;
+  console.log('body: ');
+  console.log(req.body);
   if (name && !validator.isAlphanumeric(name) ||
      about && !validator.isAlphanumeric(about) ||
      avatar && !validator.isURL(avatar) ||
-     !validator.isEmail(email) || 
-     !validator.isStrongPassword(password)) 
+     !validator.isEmail(email))
   {
       return next(new BadRequestError('Bad request. Invalid data.'));
   }
@@ -61,6 +62,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => res.status(201).json(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
+        console.log(err);
         next(new BadRequestError("Bad request. Couldn't create user."));
         return;
       }
@@ -73,6 +75,8 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
+  console.log(`body: `);
+  console.log(req.body);
   return User.findOne({ email })
     .select('+password')
     .then((user) => {
@@ -85,10 +89,17 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
             throw new NotFoundError('Password is incorrect');
           }
           const token = jwt.sign({ _id: user._id }, passphrase, { expiresIn: '7d' });
-          res.cookie('jwt', token, { maxAge: 3600 * 24 * 7, httpOnly: true });
+          // res.cookie('jwt', token, { maxAge: 3600 * 24 * 7, httpOnly: true });
+          res.send({ token });
         });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Bad request. Invalid data.'));
+        return;
+      }
+      next(err);
+    });
 }
 
 export const updateUser = (req: Request, res: Response, next: NextFunction) => {
