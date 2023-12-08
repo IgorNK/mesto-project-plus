@@ -6,8 +6,12 @@ import helmet from 'helmet';
 import { WebError, NotFoundError } from './errors';
 import cardsRouter from './routes/cards';
 import usersRouter from './routes/users';
+import { login, createUser } from './controllers/users';
+import auth from './middlewares/auth';
+import { requestLogger, errorLogger } from './middlewares/logger';
 
 const { PORT = 3000 } = process.env;
+export const passphrase = 's0m3_p4ss';
 
 const server = express();
 const jsonParser = bodyParser.json();
@@ -27,16 +31,23 @@ server.use(limiter);
 server.use(helmet());
 server.use(jsonParser);
 
-server.use((req: Request, res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '6571872aeb7aa758b3ab4e59',
-  };
+// server.use((req: Request, res: Response, next: NextFunction) => {
+//   req.user = {
+//     _id: '6571872aeb7aa758b3ab4e59',
+//   };
 
-  next();
-});
+//   next();
+// });
+server.use(requestLogger);
 
+server.post('/signin', login);
+server.post('/signup', createUser);
 server.use('/', cardsRouter);
+server.use(auth);
 server.use('/', usersRouter);
+
+server.use(errorLogger);
+
 server.use(() => {
   throw new NotFoundError('Page not found');
 });
