@@ -26,8 +26,9 @@ const limiter = rateLimit({
 const localUri = 'mongodb://localhost:27017/mestodb';
 
 mongoose.connect(localUri);
+// mongoose.connect(uri);
 
-// server.use(limiter);
+server.use(limiter);
 server.use(
   helmet({
     contentSecurityPolicy: false,
@@ -36,7 +37,6 @@ server.use(
 server.use(jsonParser);
 
 server.use(requestLogger);
-server.use(limiter);
 // server.use(express.static(path.join(__dirname, '../public/dist')));
 server.post('/signin', login);
 server.post('/signup', createUser);

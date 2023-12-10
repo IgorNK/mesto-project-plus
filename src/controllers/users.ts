@@ -131,7 +131,7 @@ export const updateAvatar = (req: Request, res: Response, next: NextFunction) =>
     .then((user) => res.status(201).json(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError("Bad request. Couldn't update avatar."));
+        next(new BadRequestError(err.message));
         return;
       }
       next(err);
