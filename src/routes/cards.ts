@@ -3,12 +3,13 @@ import {
   getCards, createCard, deleteCard, likeCard, dislikeCard,
 } from '../controllers/cards';
 
-const router = Router();
+export const routerCards = Router();
 
-router.get('/cards', getCards);
-router.post('/cards', createCard);
-router.delete('/cards/:id', deleteCard);
-router.put('/cards/:cardId/likes', likeCard);
-router.delete('/cards/:cardId/likes', dislikeCard);
+routerCards.get('/cards', getCards);
 
-export default router;
+export const routerCardsProtected = Router();
+
+routerCardsProtected.post('/cards', createCard);
+routerCardsProtected.delete('/cards/:id', deleteCard);
+routerCardsProtected.put('/cards/:cardId/likes', likeCard);
+routerCardsProtected.delete('/cards/:cardId/likes', dislikeCard);

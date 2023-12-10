@@ -1,11 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
+// import path from 'path';
 import mongoose from 'mongoose';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { WebError, NotFoundError } from './errors';
-import cardsRouter from './routes/cards';
+import { routerCards, routerCardsProtected } from './routes/cards';
 import usersRouter from './routes/users';
+import { login, createUser } from './controllers/users';
+import auth from './middlewares/auth';
+import { requestLogger, errorLogger } from './middlewares/logger';
 
 const { PORT = 3000 } = process.env;
 
@@ -18,25 +22,31 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-//const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
+// const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
 const localUri = 'mongodb://localhost:27017/mestodb';
 
 mongoose.connect(localUri);
+// mongoose.connect(uri);
 
 server.use(limiter);
-server.use(helmet());
+server.use(
+  helmet({
+    contentSecurityPolicy: false,
+  }),
+);
 server.use(jsonParser);
 
-server.use((req: Request, res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '6571872aeb7aa758b3ab4e59',
-  };
-
-  next();
-});
-
-server.use('/', cardsRouter);
+server.use(requestLogger);
+// server.use(express.static(path.join(__dirname, '../public/dist')));
+server.post('/signin', login);
+server.post('/signup', createUser);
+server.use('/', routerCards);
+server.use(auth);
+server.use('/', routerCardsProtected);
 server.use('/', usersRouter);
+
+server.use(errorLogger);
+
 server.use(() => {
   throw new NotFoundError('Page not found');
 });

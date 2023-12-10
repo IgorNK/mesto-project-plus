@@ -1,6 +1,4 @@
-import {
-  Types, model, Schema,
-} from 'mongoose';
+import { Types, model, Schema } from 'mongoose';
 
 export interface ICard {
   name: string;
@@ -19,6 +17,13 @@ const cardSchema = new Schema<ICard>({
   },
   link: {
     type: String,
+    validate: {
+      validator: (v: string) => {
+        const exp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+        return (!v || !v.trim().length) || exp.test(v);
+      },
+      message: 'Not a valid url',
+    },
     required: true,
   },
   owner: {

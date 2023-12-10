@@ -24,3 +24,6 @@ dist
 
 # Environment
 *.env
+
+# Front-end
+public

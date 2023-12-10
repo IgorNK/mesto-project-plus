@@ -15,7 +15,7 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
     .then((card) => res.status(201).json(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError("Bad request, couldn't create card"));
+        next(new BadRequestError(err.message));
         return;
       }
       next(err);
@@ -46,11 +46,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export const likeCard = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => Card.findByIdAndUpdate(
+export const likeCard = (req: Request, res: Response, next: NextFunction) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $addToSet: { likes: req.user._id } },
   { new: true },
@@ -59,7 +55,7 @@ export const likeCard = (
     if (!card) {
       throw new NotFoundError('Card not found');
     }
-    return res.status(200).json({ message: 'Liked successfully' });
+    return res.status(200).json(card);
   })
   .catch((err) => {
     if (err.name === 'CastError') {
@@ -78,7 +74,7 @@ export const dislikeCard = (
     if (!card) {
       throw new NotFoundError('Card not found');
     }
-    return res.status(200).json({ message: 'Disliked successfully' });
+    return res.status(200).json({ card });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
