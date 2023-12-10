@@ -1,33 +1,31 @@
-import express, { Request, Response, NextFunction } from "express";
-import bodyParser from "body-parser";
-import path from "path";
-import mongoose from "mongoose";
-import { rateLimit } from "express-rate-limit";
-import helmet from "helmet";
-import { WebError, NotFoundError } from "./errors";
-import { routerCards, routerCardsProtected } from "./routes/cards";
-import usersRouter from "./routes/users";
-import { login, createUser } from "./controllers/users";
-import auth from "./middlewares/auth";
-import { requestLogger, errorLogger } from "./middlewares/logger";
+import express, { Request, Response, NextFunction } from 'express';
+import bodyParser from 'body-parser';
+import path from 'path';
+import mongoose from 'mongoose';
+import { rateLimit } from 'express-rate-limit';
+import helmet from 'helmet';
+import { WebError, NotFoundError } from './errors';
+import { routerCards, routerCardsProtected } from './routes/cards';
+import usersRouter from './routes/users';
+import { login, createUser } from './controllers/users';
+import auth from './middlewares/auth';
+import { requestLogger, errorLogger } from './middlewares/logger';
 
 const { PORT = 3000 } = process.env;
-export const passphrase = "s0m3_p4ss";
 
 const server = express();
 const jsonParser = bodyParser.json();
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100, // limit each IP to 100 requests per windowMs
-  standardHeaders: "draft-7",
+  standardHeaders: 'draft-7',
   legacyHeaders: false,
 });
 
-const uri =
-  "mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority";
-//const localUri = 'mongodb://localhost:27017/mestodb';
+// const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
+const localUri = 'mongodb://localhost:27017/mestodb';
 
-mongoose.connect(uri);
+mongoose.connect(localUri);
 
 // server.use(limiter);
 server.use(
@@ -37,27 +35,20 @@ server.use(
 );
 server.use(jsonParser);
 
-// server.use((req: Request, res: Response, next: NextFunction) => {
-//   req.user = {
-//     _id: '6571872aeb7aa758b3ab4e59',
-//   };
-
-//   next();
-// });
 server.use(requestLogger);
 
-server.use(express.static(path.join(__dirname, "../public/dist")));
-server.post("/signin", login);
-server.post("/signup", createUser);
-server.use("/", routerCards);
+server.use(express.static(path.join(__dirname, '../public/dist')));
+server.post('/signin', login);
+server.post('/signup', createUser);
+server.use('/', routerCards);
 server.use(auth);
-server.use("/", routerCardsProtected);
-server.use("/", usersRouter);
+server.use('/', routerCardsProtected);
+server.use('/', usersRouter);
 
 server.use(errorLogger);
 
 server.use(() => {
-  throw new NotFoundError("Page not found");
+  throw new NotFoundError('Page not found');
 });
 
 server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -68,7 +59,7 @@ server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   }
 
   res.status(statusCode).send({
-    message: statusCode === 500 ? "Internal server error" : message,
+    message: statusCode === 500 ? 'Internal server error' : message,
   });
   next();
 });

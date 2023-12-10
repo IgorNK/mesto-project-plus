@@ -24,6 +24,13 @@ const userSchema = new Schema<IUser>({
   avatar: {
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     type: String,
+    validate: {
+      validator: function(v: string) {
+        var exp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/;
+        return (!v || !v.trim().length) || exp.test(v);
+      },
+      message: 'Avatar is not a valid url',
+    },
   },
   email: {
     type: String,
@@ -34,7 +41,7 @@ const userSchema = new Schema<IUser>({
     required: true,
     minLength: 6,
     select: false,
-  }
+  },
 });
 
 export default model<IUser>('user', userSchema);

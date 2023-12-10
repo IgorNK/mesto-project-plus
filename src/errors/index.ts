@@ -4,8 +4,5 @@ import NotFoundError from './not-found';
 import UnauthorizedError from './unauthorized';
 
 export {
-  WebError,
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
+  WebError, BadRequestError, NotFoundError, UnauthorizedError,
 };
