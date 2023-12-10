@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
-import path from 'path';
+// import path from 'path';
 import mongoose from 'mongoose';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
@@ -36,8 +36,8 @@ server.use(
 server.use(jsonParser);
 
 server.use(requestLogger);
-
-server.use(express.static(path.join(__dirname, '../public/dist')));
+server.use(limiter);
+// server.use(express.static(path.join(__dirname, '../public/dist')));
 server.post('/signin', login);
 server.post('/signup', createUser);
 server.use('/', routerCards);
