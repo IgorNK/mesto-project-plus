@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import validator from 'validator';
 
 export interface IUser {
   name: string;
@@ -35,6 +36,12 @@ const userSchema = new Schema<IUser>({
   email: {
     type: String,
     required: true,
+    validate: {
+      validator: (v: string) => {
+        return validator.isEmail(v);
+      },
+      message: 'Email is not a valid email address',
+    }
   },
   password: {
     type: String,

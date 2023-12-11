@@ -11,7 +11,7 @@ import { login, createUser } from './controllers/users';
 import auth from './middlewares/auth';
 import { requestLogger, errorLogger } from './middlewares/logger';
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DBURI = 'mongodb://localhost:27017/mestodb' } = process.env;
 
 const server = express();
 const jsonParser = bodyParser.json();
@@ -23,9 +23,8 @@ const limiter = rateLimit({
 });
 
 // const uri = 'mongodb+srv://mestouser:mestouserpwd@mesto.kmtll2w.mongodb.net/mestodb?retryWrites=true&w=majority';
-const localUri = 'mongodb://localhost:27017/mestodb';
 
-mongoose.connect(localUri);
+mongoose.connect(DBURI);
 // mongoose.connect(uri);
 
 server.use(limiter);
@@ -59,7 +58,7 @@ server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   }
 
   res.status(statusCode).send({
-    message: statusCode === 500 ? 'Internal server error' : message,
+    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
   });
   next();
 });
